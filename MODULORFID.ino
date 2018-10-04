@@ -1,3 +1,6 @@
+#include <LiquidCrystal.h>
+
+
 int RFIDResetPin = 32;
 
 //Register your RFID tags here
@@ -10,18 +13,23 @@ char tag6[13] = "1A007C5B4D70";
 char tag7[13] = "1A007C594F70";
 char tag8[13] = "1A007C58201E";
 
+LiquidCrystal lcd(12,14,2,0,4,5);
+
 void setup(){
   Serial.begin(9600);
   
   pinMode(RFIDResetPin, OUTPUT);
   digitalWrite(RFIDResetPin, HIGH);
 
-  pinMode(5, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(0, OUTPUT);
-  pinMode(2, OUTPUT);
-  pinMode(14, OUTPUT);
-  pinMode(12, OUTPUT);
+  lcd.begin(16, 2);
+  lcd.print("Aventuras PI");
+
+  //pinMode(5, OUTPUT);
+  //pinMode(4, OUTPUT);
+  //pinMode(0, OUTPUT);
+  //pinMode(2, OUTPUT);
+  //pinMode(14, OUTPUT);
+  //pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
   pinMode(15, OUTPUT);
 }
@@ -69,25 +77,29 @@ void checkTag(char tag[]){
   ///////////////////////////////////
   
   if(strlen(tag) == 0) return; //empty, no need to contunue
-  
-  if(compareTag(tag, tag1)){ // if matched tag1, do this
-    lightLED(5);
-  }else if(compareTag(tag, tag2)){ //if matched tag2, do this
-    lightLED(4);  
-  }else if(compareTag(tag, tag3)){ //if matched tag2, do this
-    lightLED(0);
-  }else if(compareTag(tag, tag4)){ //if matched tag2, do this
-    lightLED(2);
-  }else if(compareTag(tag, tag5)){ //if matched tag2, do this
-    lightLED(14);
-  }else if(compareTag(tag, tag6)){ //if matched tag2, do this
-    lightLED(12);
-  }else if(compareTag(tag, tag7)){ //if matched tag2, do this
-    lightLED(13);
-  }else if(compareTag(tag, tag8)){ //if matched tag2, do this
-    lightLED(15);}else{
+  lcd.begin(16, 2);
+  lcd.print( String("ID:")+tag+String(" "));
+  lcd.setCursor(0, 1);
+  lcd.print(String("R$:")/*+valor*/);
+ 
+//  if(compareTag(tag, tag1)){ // if matched tag1, do this
+//    lightLED(5);
+//  }else if(compareTag(tag, tag2)){ //if matched tag2, do this
+//    lightLED(4);  
+//  }else if(compareTag(tag, tag3)){ //if matched tag2, do this
+//    lightLED(0);
+//  }else if(compareTag(tag, tag4)){ //if matched tag2, do this
+//    lightLED(2);
+//  }else if(compareTag(tag, tag5)){ //if matched tag2, do this
+//    lightLED(14);
+//  }else if(compareTag(tag, tag6)){ //if matched tag2, do this
+//    lightLED(12);
+//  }else if(compareTag(tag, tag7)){ //if matched tag2, do this
+//      lightLED(13);
+//    }else if(compareTag(tag, tag8)){ //if matched tag2, do this
+//     lightLED(15);}else{
   Serial.println(tag); //read out any unknown tag
-  }
+  //}
 }
 
 void lightLED(int pin){
