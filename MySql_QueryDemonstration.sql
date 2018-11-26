@@ -1,5 +1,5 @@
 SELECT 
-     tag.numero_tag, refrigerador.nome_refrigerado, produto.nome_produto,produto.real_preco,cor.nome_cor
+     tag.numero_tag, refrigerador.nome_refrigerador, produto.nome_produto,produto.real_preco,cor.nome_cor
 FROM
     tag,
     refrigerador,

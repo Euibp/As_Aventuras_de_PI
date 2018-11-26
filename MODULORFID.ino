@@ -130,65 +130,65 @@ checkTag(tagString); //Check if it is a match
 resetReader(); //Reset the RFID reader
 
 //##########################################
-  WiFiClient client = server.available();
-  if (!client) {
-    return;
-  }
- 
-  // Wait until the client sends some data
-  Serial.println("new client");
-  while(!client.available() && index<1500){
-    delay(1);
-    index++;
-  }
- 
-  // Read the first line of the request
-  String request = client.readStringUntil('\r');
-  Serial.println(request);
-  client.flush();
-  Serial.println("Request");
-   
-  // Match the request
- 
-  int value = LOW;
-  if (request.indexOf("/LED=ON") != -1)  {
-    digitalWrite(13, HIGH);
-    value = HIGH;
-  }
-  if (request.indexOf("/LED=OFF") != -1)  {
-    digitalWrite(13, LOW);
-    value = LOW;
-  }
-
-  Serial.println("LEDING"); 
-// Set ledPin according to the request
-//digitalWrite(ledPin, value);
- 
-  // Return the response
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
-  client.println(""); //  do not forget this one
-  client.println("<!DOCTYPE HTML>");
-  client.println("<html>");
- 
-  client.print("Led is now: ");
- 
-  if(value == HIGH) {
-    client.print("On");
-  } else {
-    client.print("Off");
-  }
-  client.println("<br>");
-  client.println(regString);
-  client.println("<br><br>");
-  //client.println(String("<br>")+tagString+String("<br>"));
-  client.println("<a href=\"/LED=ON\"\"><button>On </button></a>");
-  client.println("<a href=\"/LED=OFF\"\"><button>Off </button></a><br />");  
-  client.println("</html>");
-
-  delay(1);
-  Serial.println("Client disonnected");
-  Serial.println("");
+//  WiFiClient client = server.available();
+//  if (!client) {
+//    return;
+//  }
+// 
+//  // Wait until the client sends some data
+//  Serial.println("new client");
+//  while(!client.available() && index<1500){
+//    delay(1);
+//    index++;
+//  }
+// 
+//  // Read the first line of the request
+//  String request = client.readStringUntil('\r');
+//  Serial.println(request);
+//  client.flush();
+//  Serial.println("Request");
+//   
+//  // Match the request
+// 
+//  int value = LOW;
+//  if (request.indexOf("/LED=ON") != -1)  {
+//    digitalWrite(13, HIGH);
+//    value = HIGH;
+//  }
+//  if (request.indexOf("/LED=OFF") != -1)  {
+//    digitalWrite(13, LOW);
+//    value = LOW;
+//  }
+//
+//  Serial.println("LEDING"); 
+//// Set ledPin according to the request
+////digitalWrite(ledPin, value);
+// 
+//  // Return the response
+//  client.println("HTTP/1.1 200 OK");
+//  client.println("Content-Type: text/html");
+//  client.println(""); //  do not forget this one
+//  client.println("<!DOCTYPE HTML>");
+//  client.println("<html>");
+// 
+//  client.print("Led is now: ");
+// 
+//  if(value == HIGH) {
+//    client.print("On");
+//  } else {
+//    client.print("Off");
+//  }
+//  client.println("<br>");
+//  client.println(regString);
+//  client.println("<br><br>");
+//  //client.println(String("<br>")+tagString+String("<br>"));
+//  client.println("<a href=\"/LED=ON\"\"><button>On </button></a>");
+//  client.println("<a href=\"/LED=OFF\"\"><button>Off </button></a><br />");  
+//  client.println("</html>");
+//
+//  delay(1);
+//  Serial.println("Client disonnected");
+//  Serial.println("");
   //##########################################
 }
 
@@ -196,104 +196,71 @@ void checkTag(char tag[]){
   ///////////////////////////////////
   //Check the read tag against known tags
   ///////////////////////////////////
+  WiFiClient PHPserver;
   
   if(strlen(tag) == 0) return; //empty, no need to contunue
   lcd.begin(16, 2);
   lcd.print( String("ID:")+tag+String(" "));
   lcd.setCursor(0, 1);
-  lcd.print(String("COR:")/*+valor*/);
- 
-  if(compareTag(tag, tag1)){ // if matched tag1, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("INSERINDO")/*+valor*/);
-      
-      WiFiClient PHPserver;
-      if(!PHPserver.connect(Ipv4,80)){
-        Serial.println("Falha de Conexao");
-        return;
-      }
-      Serial.println("Connect");
-      //client.print(String("GET ")+ Road + " HTTP/1.1\r\n" + "Host: " + Ipv4 + "\r\n" + "Connection: close\r\n\r\n");
-      PHPserver.println("GET " + Road + " HTTP/1.1");
-      PHPserver.println(String("Host: ") + Ipv4);
-      PHPserver.println("Connection: close");
-      PHPserver.println();
-      
-      Serial.println("Client available?");
-      unsigned long timeout = millis();
-      while (PHPserver.available() == 0){
-        if(millis()-timeout >5000){
-          Serial.println("Client Timeout");
-          PHPserver.stop();
-          return;
-         }
-        }
-      Serial.println("Yes what to say?");  
-      while (PHPserver.available()){
-        String line = PHPserver.readStringUntil('\r');
-        Serial.println(line);
-        }
-      Serial.println("End");      
-      PHPserver.flush();
-      PHPserver.stop();
-      lcd.setCursor(5, 1);
-      lcd.print(String("VERMELHO ")/*+valor*/);
-      
-    }else if(compareTag(tag, tag2)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("REMOVENDO")/*+valor*/);
-      
-      WiFiClient client;
-      if(!client.connect(Ipv4,80)){
-        Serial.println("Falha de Conexao");
-        return;
-      }
-      Serial.println("Connect");
-      client.println("GET /Aventuras_PI/PHP_Remove.php HTTP/1.1");
-      client.println(String("Host: ") + Ipv4);
-      client.println("Connection: close");
-      client.println();
-      
-      Serial.println("Client available?");
-      unsigned long timeout = millis();
-      while (client.available() == 0){
-        if(millis()-timeout >5000){
-          Serial.println("Client Timeout");
-          client.stop();
-          return;
-         }
-        }
-      Serial.println("Yes what to say?");  
-      while (client.available()){
-        String line = client.readStringUntil('\r');
-        Serial.println(line);
-        }
-      Serial.println("End");        
+  lcd.print(String("COR: ")/*+valor*/);
 
-      lcd.setCursor(5, 1);
-      lcd.print(String("AZUL     ")/*+valor*/);     
+  //Acesso ao Banco de Dados
+  //##################################################
+  String line = ""; 
+  int cont = 0; 
+  if(!PHPserver.connect(Ipv4,80)){
+        Serial.println("Falha de Conexao");
+        return;
+      }
+    Serial.println("Connect");
+    //client.print(String("GET ")+ Road + " HTTP/1.1\r\n" + "Host: " + Ipv4 + "\r\n" + "Connection: close\r\n\r\n");
+    //Serial.println("GET /Aventuras_PI/PHP_Collect.php?tag=\"" + String(tag) +"\"&local=Richard_Parcker");
+    PHPserver.println("GET /Aventuras_PI/PHP_Collect.php?tag=\"" + String(tag) +"\"&local=Richard_Parcker" + " HTTP/1.1");
+    PHPserver.println(String("Host: ") + Ipv4);
+    PHPserver.println("Connection: close");
+    PHPserver.println();
+    
+    unsigned long timeout = millis();
+    while (PHPserver.available() == 0){
+      if(millis()-timeout >5000){
+        Serial.println("Client Timeout");
+        PHPserver.stop();
+        return;
+       }
+      }
       
-  }else if(compareTag(tag, tag3)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("BRANCO")/*+valor*/);
-  }else if(compareTag(tag, tag4)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("VERDE")/*+valor*/);
-  }else if(compareTag(tag, tag5)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("PRETO")/*+valor*/);
-  }else if(compareTag(tag, tag6)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("VERMELHO")/*+valor*/);
-  }else if(compareTag(tag, tag7)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("AZUL")/*+valor*/);
-    }else if(compareTag(tag, tag8)){ //if matched tag2, do this
-      lcd.setCursor(5, 1);
-      lcd.print(String("PERCE")/*+valor*/);
-    }else{
-  //Serial.println(tag); //read out any unknown tag
-  }
+    PHPserver.readStringUntil('*');
+    while (PHPserver.available()){
+      line = PHPserver.readStringUntil('*');
+      switch (cont){
+        case 0: // Inserindo(I) ou Removendo (R)
+           if(line != "INVALIDO"){  
+             lcd.setCursor(15, 1);
+             lcd.print(line);
+             Serial.println(line);
+           }else{      
+             lcd.setCursor(0, 1);
+             lcd.print(line + "        ");
+            } ;
+          break;
+        case 1: //Cor da Caixa
+         lcd.setCursor(5, 1);
+         lcd.print(line);
+         Serial.println(line);
+        break; // Preço da Caixa Se quiser mostrar
+        case 2:
+        break;
+//          case 3: // Tag para monstrar que está no banco de dados
+//          break;
+//          case 4:// Recipiente onde estava a tag
+//          break
+        default:
+        break; 
+        }
+        cont++;       
+      }
+    Serial.println("End");
+    
 }
 
 void lightLED(int pin){
